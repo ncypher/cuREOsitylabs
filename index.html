@@ -217,6 +217,8 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 .stamp{position:absolute;right:22px;bottom:70px;transform:rotate(-12deg);border:3px solid #b5462a;color:#b5462a;font:900 22px/1 var(--display);text-transform:uppercase;padding:6px 10px;opacity:.75;letter-spacing:.05em}
 .ticket-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
 .bench-status{min-height:1.6em;font-size:15px;color:var(--grand);margin-top:16px}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.btn[disabled]{opacity:.6;cursor:progress}
 .bench-foot{font-size:15px;color:var(--steel);margin-top:4px}
 .bench-foot code{font:inherit;color:var(--fog);user-select:all}
 
@@ -453,6 +455,17 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
               <input type="text" id="org" maxlength="120" placeholder="Optional">
             </div>
           </div>
+          <div class="row2">
+            <div class="field">
+              <label for="lead-name">Your name</label>
+              <input type="text" id="lead-name" maxlength="120" autocomplete="name" placeholder="Optional">
+            </div>
+            <div class="field">
+              <label for="lead-contact">Email or phone</label>
+              <input type="text" id="lead-contact" maxlength="200" autocomplete="email" placeholder="So Tom can reply">
+            </div>
+          </div>
+          <div class="hp" aria-hidden="true"><label for="lead-website">Website</label><input type="text" id="lead-website" tabindex="-1" autocomplete="off"></div>
           <div class="field">
             <label for="tools">Tools you use now</label>
             <input type="text" id="tools" maxlength="200" placeholder="Spreadsheets, QuickBooks, a whiteboard…">
@@ -475,12 +488,13 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
             <span class="stamp" aria-hidden="true">On the bench</span>
           </article>
           <div class="ticket-actions">
-            <a class="btn" id="mail-brief" href="#">Email it to the workshop</a>
+            <button type="button" class="btn" id="send-brief">Send to the workshop</button>
+            <a class="btn ghost" id="mail-brief" href="#">Open in my email</a>
             <button type="button" class="btn ghost" id="copy-brief">Copy brief</button>
             <button type="button" class="btn ghost" id="dl-brief">Download</button>
           </div>
           <p class="bench-status" id="bench-status" role="status"></p>
-          <p class="bench-foot">Nothing leaves your browser until you send it. Email opens your own mail app; if it doesn’t, copy the brief and send it to <code id="contact-addr"></code>.</p>
+          <p class="bench-foot">Nothing leaves your browser until you press Send. Prefer your own email? Use Open in my email, or copy the brief and send it to <code id="contact-addr"></code>.</p>
         </div>
       </div>
     </div>
@@ -569,7 +583,8 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 <script>
 (function(){
   "use strict";
-  var CONTACT_EMAIL = "hello@cureositylabs.com"; // Tom: confirm this mailbox exists
+  var CONTACT_EMAIL = "hello@cureositylabs.com";
+  var LEAD_URL = "https://thomas-harwood-site.tharwood75.workers.dev/api/lead";
 
   /* ---------- River confluence ---------- */
   var cv = document.getElementById("river");
@@ -814,6 +829,21 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
     if (navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(function(){ status.textContent = "Brief copied."; }, fallback);
     } else fallback();
+  });
+  $("send-brief").addEventListener("click", function(){
+    var btn = this, v = vals(), contact = $("lead-contact").value.trim();
+    if (v.wish.length < 20){ status.textContent = "Describe your what-if in a sentence or two first (at least 20 characters)."; $("wish").focus(); return; }
+    if (contact.length < 5){ status.textContent = "Add an email address or phone number so Tom can reply."; $("lead-contact").focus(); return; }
+    btn.disabled = true; btn.textContent = "Sending…"; status.textContent = "";
+    fetch(LEAD_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({
+      site:"cureositylabs.com", name:$("lead-name").value.trim(), contact:contact, org:v.org, start:LABELS[v.start],
+      team:v.team, tools:v.tools, brief:brief(), website:$("lead-website").value })})
+    .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      if (res.ok){ btn.textContent = "Sent"; status.textContent = "Sent to the workshop. Tom will reply to " + contact + "."; }
+      else { btn.disabled = false; btn.textContent = "Send to the workshop"; status.textContent = (res.d && res.d.error) || "Couldn’t send it. Use Open in my email instead."; }
+    })
+    .catch(function(){ btn.disabled = false; btn.textContent = "Send to the workshop"; status.textContent = "Couldn’t reach the workshop. Use Open in my email instead."; });
   });
   $("dl-brief").addEventListener("click", function(){
     try{
