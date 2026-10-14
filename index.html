@@ -491,7 +491,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
             <button type="button" class="btn" id="send-brief">Send to the workshop</button>
             <a class="btn ghost" id="mail-brief" href="#">Open in my email</a>
             <button type="button" class="btn ghost" id="copy-brief">Copy brief</button>
-            <button type="button" class="btn ghost" id="dl-brief">Download</button>
+            <button type="button" class="btn ghost" id="dl-brief">Download PDF</button>
           </div>
           <p class="bench-status" id="bench-status" role="status"></p>
           <p class="bench-foot">Nothing leaves your browser until you press Send. Prefer your own email? Use Open in my email, or copy the brief and send it to <code id="contact-addr"></code>.</p>
@@ -845,15 +845,71 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
     })
     .catch(function(){ btn.disabled = false; btn.textContent = "Send to the workshop"; status.textContent = "Couldn’t reach the workshop. Use Open in my email instead."; });
   });
+  /* ---------- Branded PDF work order ---------- */
+  function loadScript(src){ return new Promise(function(res, rej){ var t = document.createElement("script"); t.src = src; t.onload = res; t.onerror = rej; document.head.appendChild(t); }); }
+  function loadLogo(){
+    return fetch("assets/logo-print.png").then(function(r){ if (!r.ok) throw 0; return r.blob(); })
+      .then(function(b){ return new Promise(function(res){ var fr = new FileReader(); fr.onload = function(){ res(fr.result); }; fr.readAsDataURL(b); }); })
+      .catch(function(){ return null; });
+  }
+  function plain(t){ return String(t).replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/…/g, "...").replace(/[–—]/g, "-"); }
+  function makePdf(logo){
+    var v = vals(), J = window.jspdf.jsPDF, d = new J({unit:"pt", format:"letter"});
+    var M = 54, W = 612 - 2*M, y;
+    var INK = [24,30,33], MUTED = [104,116,118], TEAL = [18,128,124], AMBER = [230,128,40];
+    if (logo) d.addImage(logo, "PNG", M, 40, 96, 96);
+    var tx = logo ? M + 112 : M;
+    d.setFont("helvetica","bold"); d.setFontSize(28); d.setTextColor.apply(d, INK); d.text("cuREOsity labs", tx, 80);
+    d.setFont("helvetica","normal"); d.setFontSize(11); d.setTextColor.apply(d, TEAL); d.text("Where curiosity and automation converge.", tx, 100);
+    d.setTextColor.apply(d, MUTED); d.setFontSize(10); d.text("An independent technology workshop in REO Town, Lansing, Michigan", tx, 116);
+    d.setDrawColor.apply(d, AMBER); d.setLineWidth(2); d.line(M, 152, M + W, 152);
+    y = 184;
+    d.setFont("helvetica","bold"); d.setFontSize(18); d.setTextColor.apply(d, INK); d.text("Work order", M, y);
+    d.setFontSize(11); d.setTextColor.apply(d, MUTED); d.text(woNo + "   " + now.toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}), M + W, y, {align:"right"});
+    y += 28;
+    var rows = [["For", v.org || "Not given"], ["Name", $("lead-name").value.trim() || "Not given"], ["Contact", $("lead-contact").value.trim() || "Not given"],
+                ["Start", LABELS[v.start]], ["Team", v.team || "Not given"], ["Tools now", v.tools || "Not given"]];
+    rows.forEach(function(r){
+      var lines = d.splitTextToSize(plain(r[1]), W - 100);
+      d.setFont("helvetica","bold"); d.setFontSize(9); d.setTextColor.apply(d, MUTED); d.text(r[0].toUpperCase(), M, y);
+      d.setFont("helvetica","normal"); d.setFontSize(11); d.setTextColor.apply(d, INK); d.text(lines, M + 100, y);
+      y += 16 * lines.length + 4;
+    });
+    y += 12;
+    d.setFont("helvetica","bold"); d.setFontSize(13); d.setTextColor.apply(d, TEAL); d.text("What if...", M, y); y += 20;
+    d.setFont("helvetica","normal"); d.setFontSize(14); d.setTextColor.apply(d, INK);
+    var wish = d.splitTextToSize(plain(wishText(v.wish).replace(/^…/, "...")), W);
+    d.text(wish, M, y); y += 19 * wish.length + 14;
+    var q = d.splitTextToSize(plain(QUESTIONS[v.start]), W - 32);
+    var boxH = 30 + 15 * q.length;
+    d.setFillColor(231, 246, 245); d.setDrawColor.apply(d, TEAL); d.setLineWidth(1); d.roundedRect(M, y, W, boxH, 6, 6, "FD");
+    d.setFont("helvetica","bold"); d.setFontSize(10); d.setTextColor.apply(d, TEAL); d.text("FIRST QUESTION ON THE BENCH", M + 16, y + 20);
+    d.setFont("helvetica","normal"); d.setFontSize(11); d.setTextColor.apply(d, INK); d.text(q, M + 16, y + 36);
+    y += boxH + 26;
+    if (y > 600){ d.addPage(); y = 64; }
+    d.setFont("helvetica","bold"); d.setFontSize(12); d.setTextColor.apply(d, INK); d.text("What happens next", M, y); y += 17;
+    d.setFont("helvetica","normal"); d.setFontSize(10.5); d.setTextColor.apply(d, MUTED);
+    var next = d.splitTextToSize("Send this work order to hello@cureositylabs.com, or press Send to the workshop on cureositylabs.com. Tom reads every brief himself and replies to start a conversation about the real problem before anything gets built.", W);
+    d.text(next, M, y); y += 14 * next.length + 16;
+    d.setFont("helvetica","bold"); d.setFontSize(12); d.setTextColor.apply(d, INK); d.text("About cuREOsity labs", M, y); y += 17;
+    d.setFont("helvetica","normal"); d.setFontSize(10.5); d.setTextColor.apply(d, MUTED);
+    var about = d.splitTextToSize("Enterprise-grade software at a small-business price. Custom software and databases, integrations and middleware, QuickBase and ServiceNow, QuickBooks connections, applied AI, and sensor networks that work with or without the internet. Built around the way your business already works, and your data stays yours.", W);
+    d.text(about, M, y);
+    var pages = d.getNumberOfPages();
+    for (var i = 1; i <= pages; i++){
+      d.setPage(i);
+      d.setDrawColor(220, 226, 226); d.setLineWidth(0.75); d.line(M, 744, M + W, 744);
+      d.setFont("helvetica","normal"); d.setFontSize(9); d.setTextColor.apply(d, MUTED);
+      d.text("CuREOsity Labs LLC  |  REO Town, Lansing, Michigan  |  hello@cureositylabs.com  |  cureositylabs.com", 306, 760, {align:"center"});
+    }
+    d.save(woNo + ".pdf");
+  }
   $("dl-brief").addEventListener("click", function(){
-    try{
-      var blob = new Blob([brief() + "\n"], {type:"text/plain"});
-      var a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = woNo + ".txt";
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
-      status.textContent = "Brief downloaded as " + woNo + ".txt.";
-    }catch(err){ status.textContent = "Download isn’t available here. Use Copy brief instead."; }
+    var btn = this; btn.disabled = true; btn.textContent = "Making PDF…"; status.textContent = "";
+    var ready = window.jspdf ? Promise.resolve() : loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    ready.then(loadLogo).then(function(logo){ makePdf(logo); status.textContent = "Saved " + woNo + ".pdf."; })
+      .catch(function(){ status.textContent = "Couldn’t make the PDF here. Use Copy brief instead."; })
+      .then(function(){ btn.disabled = false; btn.textContent = "Download PDF"; });
   });
 })();
 </script>
