@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Workshop inbox | cuREOsity labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Big+Shoulders+Display:wght@800;900&display=swap">
+<style>
+:root{--bg:#060e12;--deep:#03080a;--rule:#17303a;--fog:#e6eeea;--steel:#93aaaa;--grand:#5fe3dc;--cedar:#ff9f45;--display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fog);font:16px/1.55 var(--body)}
+.wrap{max-width:1040px;margin:0 auto;padding:32px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;border-bottom:1px solid var(--rule);padding-bottom:18px;margin-bottom:24px}
+h1{font:900 clamp(40px,7vw,64px)/.9 var(--display);text-transform:uppercase;margin:0}
+h1 span{color:var(--grand)}
+.wordmark{font:800 22px/1 var(--display);color:var(--cedar);text-decoration:none}.wordmark b{color:var(--grand)}
+button,select,input,textarea{font:inherit;color:var(--fog)}
+.btn{min-height:42px;padding:0 16px;font:800 17px/1 var(--display);text-transform:uppercase;letter-spacing:.04em;border:2px solid var(--grand);background:var(--grand);color:var(--deep);border-radius:2px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fog);border-color:var(--rule)}
+.btn:hover{box-shadow:0 0 18px rgba(95,227,220,.35)}
+.btn[disabled]{opacity:.6;cursor:progress}
+:focus-visible{outline:2px solid var(--grand);outline-offset:3px}
+.key{display:grid;gap:10px;max-width:520px;border:1px solid var(--rule);padding:20px;border-radius:3px;background:var(--deep)}
+.key label{font:800 18px/1 var(--display);text-transform:uppercase;letter-spacing:.04em}
+input[type=password],select,textarea{width:100%;background:var(--bg);border:1px solid var(--rule);border-radius:2px;padding:10px 12px}
+textarea{min-height:70px;resize:vertical}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:20px}
+.chip{border:1px solid var(--rule);border-radius:999px;padding:6px 14px;background:transparent;color:var(--steel);cursor:pointer;font-size:14px}
+.chip[aria-pressed=true]{background:var(--grand);border-color:var(--grand);color:var(--deep)}
+.spacer{flex:1}
+.status{min-height:1.5em;color:var(--grand);font-size:15px;margin:0 0 14px}
+.status.err{color:var(--cedar)}
+.lead{border:1px solid var(--rule);border-left:3px solid var(--steel);border-radius:3px;padding:18px 20px;margin-bottom:14px;background:var(--deep)}
+.lead[data-status=new]{border-left-color:var(--cedar)}
+.lead[data-status=talked],.lead[data-status=pilot]{border-left-color:var(--grand)}
+.lead .top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;align-items:baseline}
+.lead h2{font:800 26px/1 var(--display);text-transform:uppercase;margin:0}
+.lead .when{font-size:14px;color:var(--steel);font-variant-numeric:tabular-nums}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 10px;font-size:15px;color:var(--steel)}
+.meta a{color:var(--grand)}
+.brief{white-space:pre-wrap;overflow-wrap:anywhere;background:var(--bg);border:1px solid var(--rule);padding:12px 14px;border-radius:2px;font-size:15px;margin:0;max-height:260px;overflow:auto}
+.edit{display:grid;grid-template-columns:180px minmax(0,1fr) auto;gap:10px;margin-top:12px;align-items:start}
+@media (max-width:640px){.edit{grid-template-columns:1fr}}
+.empty{color:var(--steel);border:1px dashed var(--rule);padding:28px;text-align:center;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><a class="wordmark" href="/">cu<b>REO</b>sity labs</a><h1>Workshop <span>inbox</span></h1></div>
+    <div class="bar" style="margin:0"><button class="btn ghost" id="refresh" type="button" hidden>Refresh</button><button class="btn ghost" id="forget" type="button" hidden>Forget key</button></div>
+  </header>
+
+  <form class="key" id="key-form" hidden>
+    <label for="key">Inbox key</label>
+    <input type="password" id="key" autocomplete="current-password" required minlength="32" placeholder="The ADMIN_TOKEN secret from Cloudflare">
+    <span style="color:var(--steel);font-size:14px">Remembered only in this browser. Leave it off shared computers.</span>
+    <button class="btn" type="submit">Open inbox</button>
+  </form>
+
+  <p class="status" id="status" role="status"></p>
+  <div class="bar" id="filters" hidden></div>
+  <div id="list"></div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var API = "https://thomas-harwood-site.tharwood75.workers.dev/api/leads";
+  var STATUSES = ["new","contacted","talked","pilot","closed"];
+  var KEY_NAME = "cureosity-inbox-key";
+  var $ = function(id){ return document.getElementById(id); };
+  var key = "", leads = [], filter = "all";
+  function load(k){ try { return localStorage.getItem(k) || ""; } catch(e){ return ""; } }
+  function save(k, v){ try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch(e){} }
+  function say(msg, err){ var s = $("status"); s.textContent = msg; s.className = "status" + (err ? " err" : ""); }
+  function el(tag, cls, text){ var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function call(path, opts){
+    opts = opts || {};
+    return fetch(API + path, {method: opts.method || "GET", headers: Object.assign({"Authorization": "Bearer " + key}, opts.body ? {"Content-Type": "application/json"} : {}), body: opts.body ? JSON.stringify(opts.body) : undefined})
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(d){ if (!r.ok) { var e = new Error(d.error || "The inbox answered " + r.status + "."); e.status = r.status; throw e; } return d; }); });
+  }
+  function showKeyForm(msg){
+    $("key-form").hidden = false; $("refresh").hidden = true; $("forget").hidden = true; $("filters").hidden = true; $("list").textContent = "";
+    say(msg || "", !!msg);
+  }
+  function fetchLeads(){
+    say("Loading leads…");
+    call("").then(function(d){
+      leads = d.leads || [];
+      $("key-form").hidden = true; $("refresh").hidden = false; $("forget").hidden = false;
+      say(leads.length ? "" : "No leads yet."); draw();
+    }).catch(function(e){
+      if (e.status === 401){ save(KEY_NAME, ""); key = ""; showKeyForm("That key didn’t work. Paste the ADMIN_TOKEN secret again."); }
+      else say(e.message || "Couldn’t reach the inbox.", true);
+    });
+  }
+  function drawFilters(){
+    var f = $("filters"); f.textContent = ""; f.hidden = false;
+    ["all"].concat(STATUSES).forEach(function(s){
+      var n = s === "all" ? leads.length : leads.filter(function(l){ return (l.status || "new") === s; }).length;
+      var b = el("button", "chip", s.charAt(0).toUpperCase() + s.slice(1) + " (" + n + ")");
+      b.type = "button"; b.setAttribute("aria-pressed", String(filter === s));
+      b.addEventListener("click", function(){ filter = s; draw(); });
+      f.appendChild(b);
+    });
+  }
+  function draw(){
+    drawFilters();
+    var list = $("list"); list.textContent = "";
+    var shown = leads.filter(function(l){ return filter === "all" || (l.status || "new") === filter; });
+    if (!shown.length){ list.appendChild(el("p", "empty", leads.length ? "Nothing with this status." : "No leads yet. When someone presses Send to the workshop, it lands here and in your Gmail.")); return; }
+    shown.forEach(function(l){
+      var card = el("article", "lead"); card.dataset.status = l.status || "new";
+      var top = el("div", "top");
+      top.appendChild(el("h2", null, l.org || l.name || "Unnamed lead"));
+      top.appendChild(el("span", "when", "#" + l.id + "  " + new Date(l.created_at * 1000).toLocaleString(undefined, {month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit"})));
+      card.appendChild(top);
+      var meta = el("div", "meta");
+      if (l.name) meta.appendChild(el("span", null, l.name));
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(l.contact || "")){ var a = el("a", null, l.contact); a.href = "mailto:" + l.contact; meta.appendChild(a); }
+      else meta.appendChild(el("span", null, l.contact));
+      [l.start, l.team, l.tools ? "Tools: " + l.tools : "", l.site].forEach(function(x){ if (x) meta.appendChild(el("span", null, x)); });
+      card.appendChild(meta);
+      card.appendChild(el("pre", "brief", l.brief));
+      var edit = el("div", "edit");
+      var sel = el("select"); sel.setAttribute("aria-label", "Status for lead " + l.id);
+      STATUSES.forEach(function(s){ var o = el("option", null, s.charAt(0).toUpperCase() + s.slice(1)); o.value = s; if ((l.status || "new") === s) o.selected = true; sel.appendChild(o); });
+      var note = el("textarea"); note.value = l.note || ""; note.placeholder = "Private note: next step, what you heard…"; note.setAttribute("aria-label", "Note for lead " + l.id); note.maxLength = 2000;
+      var btn = el("button", "btn", "Save"); btn.type = "button";
+      btn.addEventListener("click", function(){
+        btn.disabled = true; btn.textContent = "Saving…";
+        call("/update", {method:"POST", body:{id:l.id, status:sel.value, note:note.value}})
+          .then(function(){ l.status = sel.value; l.note = note.value; say("Saved lead #" + l.id + "."); draw(); })
+          .catch(function(e){ say(e.message || "Couldn’t save.", true); btn.disabled = false; btn.textContent = "Save"; });
+      });
+      edit.appendChild(sel); edit.appendChild(note); edit.appendChild(btn);
+      card.appendChild(edit);
+      list.appendChild(card);
+    });
+  }
+  $("key-form").addEventListener("submit", function(e){
+    e.preventDefault(); key = $("key").value.trim(); if (key.length < 32){ say("The key is at least 32 characters.", true); return; }
+    save(KEY_NAME, key); $("key").value = ""; fetchLeads();
+  });
+  $("refresh").addEventListener("click", fetchLeads);
+  $("forget").addEventListener("click", function(){ save(KEY_NAME, ""); key = ""; leads = []; showKeyForm("Key forgotten on this browser."); });
+  key = load(KEY_NAME);
+  key ? fetchLeads() : showKeyForm();
+})();
+</script>
+</body>
+</html>

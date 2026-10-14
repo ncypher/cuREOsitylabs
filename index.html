@@ -219,6 +219,14 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 .bench-status{min-height:1.6em;font-size:15px;color:var(--grand);margin-top:16px}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .btn[disabled]{opacity:.6;cursor:progress}
+.ai-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:12px}
+.ai-row .hint{margin:0}
+.ai-read{border:1px solid var(--grand);border-radius:3px;padding:18px 20px;background:rgba(95,227,220,.05);box-shadow:0 0 24px -12px rgba(95,227,220,.5)}
+.ai-read .ai-tag{font-size:13px;color:var(--grand);margin-bottom:10px}
+.ai-read h3{font-size:26px;margin-bottom:12px}
+.ai-read dl{margin:0;display:grid;gap:4px 0}
+.ai-read dt{font:800 15px/1.2 var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--steel);margin-top:8px}
+.ai-read dd{margin:0;font-size:16px;line-height:1.5}
 .bench-foot{font-size:15px;color:var(--steel);margin-top:4px}
 .bench-foot code{font:inherit;color:var(--fog);user-select:all}
 
@@ -441,7 +449,18 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
           <div class="field">
             <label for="wish">What if we could…</label>
             <textarea id="wish" maxlength="900" placeholder="…stop retyping every work order into three different places."></textarea>
+            <div class="ai-row"><button type="button" class="btn ghost small" id="ai-sharpen">Sharpen it with AI</button><span class="hint" id="ai-status">Optional. An AI first read of your idea, before Tom sees it.</span></div>
           </div>
+          <section class="ai-read" id="ai-read" hidden aria-live="polite">
+            <p class="ai-tag">AI first read. A starting point, not a quote. Tom reviews every brief himself.</p>
+            <h3 id="ai-title"></h3>
+            <dl>
+              <dt>Where it breaks</dt><dd id="ai-disconnect"></dd>
+              <dt>The missing layer</dt><dd id="ai-layer"></dd>
+              <dt>Where a person stays in charge</dt><dd id="ai-human"></dd>
+              <dt>A small first version</dt><dd id="ai-first"></dd>
+            </dl>
+          </section>
           <div class="row2">
             <div class="field">
               <label for="team">Team size</label>
@@ -485,6 +504,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
               <dt>Tools</dt><dd id="t-tools">Not given</dd>
             </dl>
             <p class="first-q"><b>First question on the bench:</b> <span id="t-q"></span></p>
+            <p class="first-q" id="t-ai" hidden><b>AI first read:</b> <span id="t-ai-title"></span></p>
             <span class="stamp" aria-hidden="true">On the bench</span>
           </article>
           <div class="ticket-actions">
@@ -585,6 +605,8 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
   "use strict";
   var CONTACT_EMAIL = "hello@cureositylabs.com";
   var LEAD_URL = "https://thomas-harwood-site.tharwood75.workers.dev/api/lead";
+  var FOUNDRY_URL = "https://thomas-harwood-site.tharwood75.workers.dev/api/foundry";
+  var aiConcept = null;
 
   /* ---------- River confluence ---------- */
   var cv = document.getElementById("river");
@@ -799,7 +821,8 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
       "Tools now: " + (v.tools || "(not given)"),
       "",
       "First question on the bench: " + QUESTIONS[v.start]
-    ].join("\n");
+    ].concat(aiConcept ? ["", "AI first read: " + aiConcept.title, "  Where it breaks: " + aiConcept.disconnect, "  The missing layer: " + aiConcept.missingLayer,
+      "  Where a person stays in charge: " + aiConcept.humanCheckpoint, "  A small first version: " + aiConcept.firstVersion] : []).join("\n");
   }
   function render(){
     var v = vals();
@@ -810,11 +833,33 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
     $("t-tools").textContent = v.tools || "Not given";
     $("t-q").textContent = QUESTIONS[v.start];
     $("t-example").hidden = !!v.wish;
+    $("t-ai").hidden = !aiConcept; $("t-ai-title").textContent = aiConcept ? aiConcept.title : "";
     var subject = "What-if brief: " + LABELS[v.start] + (v.org ? " for " + v.org : "");
     $("mail-brief").href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(brief());
     status.textContent = "";
   }
-  form.addEventListener("input", render);
+  form.addEventListener("input", function(e){
+    if (e.target && e.target.id === "wish" && aiConcept){ aiConcept = null; $("ai-read").hidden = true; $("ai-status").textContent = "You changed the idea, so the AI read was cleared. Sharpen again any time."; }
+    render();
+  });
+  $("ai-sharpen").addEventListener("click", function(){
+    var btn = this, v = vals(), aiStatus = $("ai-status");
+    if (v.wish.length < 20){ aiStatus.textContent = "Write a sentence or two first (at least 20 characters)."; $("wish").focus(); return; }
+    var workflow = ("What if we could " + v.wish.replace(/^(…|\.\.\.)/, "") + (v.tools ? " Tools we use now: " + v.tools + "." : "") + (v.team ? " Team: " + v.team + "." : "")).slice(0, 1200);
+    btn.disabled = true; btn.textContent = "Thinking…"; aiStatus.textContent = "";
+    fetch(FOUNDRY_URL, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({workflow: workflow})})
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(d){ return {ok:r.ok, d:d}; }); })
+      .then(function(res){
+        var c = res.d && res.d.concept;
+        if (!res.ok || res.d.source !== "ai" || !c || typeof c.title !== "string"){ aiStatus.textContent = (res.d && res.d.error) || "The AI couldn’t read that one. Your brief still works without it."; return; }
+        aiConcept = {title:c.title, disconnect:c.disconnect, missingLayer:c.missingLayer, humanCheckpoint:c.humanCheckpoint, firstVersion:c.firstVersion};
+        $("ai-title").textContent = c.title; $("ai-disconnect").textContent = c.disconnect; $("ai-layer").textContent = c.missingLayer;
+        $("ai-human").textContent = c.humanCheckpoint; $("ai-first").textContent = c.firstVersion;
+        $("ai-read").hidden = false; aiStatus.textContent = "Added to your work order."; render();
+      })
+      .catch(function(){ aiStatus.textContent = "Couldn’t reach the AI right now. Your brief still works without it."; })
+      .then(function(){ btn.disabled = false; btn.textContent = "Sharpen it with AI"; });
+  });
   form.addEventListener("change", render);
   form.addEventListener("submit", function(e){ e.preventDefault(); });
   render();
@@ -886,7 +931,21 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
     d.setFont("helvetica","bold"); d.setFontSize(10); d.setTextColor.apply(d, TEAL); d.text("FIRST QUESTION ON THE BENCH", M + 16, y + 20);
     d.setFont("helvetica","normal"); d.setFontSize(11); d.setTextColor.apply(d, INK); d.text(q, M + 16, y + 36);
     y += boxH + 26;
-    if (y > 600){ d.addPage(); y = 64; }
+    if (aiConcept){
+      var aiRows = [["Where it breaks", aiConcept.disconnect], ["Missing layer", aiConcept.missingLayer], ["Human checkpoint", aiConcept.humanCheckpoint], ["First version", aiConcept.firstVersion]];
+      if (y > 520){ d.addPage(); y = 64; }
+      d.setFont("helvetica","bold"); d.setFontSize(12); d.setTextColor.apply(d, INK); d.text("AI first read: " + plain(aiConcept.title).slice(0, 80), M, y); y += 14;
+      d.setFont("helvetica","italic"); d.setFontSize(9); d.setTextColor.apply(d, MUTED); d.text("Generated by AI as a starting point. Tom reviews every brief himself.", M, y); y += 16;
+      aiRows.forEach(function(r){
+        var lines = d.splitTextToSize(plain(r[1]), W - 120);
+        if (y + 14 * lines.length > 720){ d.addPage(); y = 64; }
+        d.setFont("helvetica","bold"); d.setFontSize(9); d.setTextColor.apply(d, TEAL); d.text(r[0].toUpperCase(), M, y);
+        d.setFont("helvetica","normal"); d.setFontSize(10.5); d.setTextColor.apply(d, INK); d.text(lines, M + 120, y);
+        y += 13 * lines.length + 5;
+      });
+      y += 6;
+    }
+    if (y > 624){ d.addPage(); y = 64; }
     d.setFont("helvetica","bold"); d.setFontSize(12); d.setTextColor.apply(d, INK); d.text("What happens next", M, y); y += 17;
     d.setFont("helvetica","normal"); d.setFontSize(10.5); d.setTextColor.apply(d, MUTED);
     var next = d.splitTextToSize("Send this work order to hello@cureositylabs.com, or press Send to the workshop on cureositylabs.com. Tom reads every brief himself and replies to start a conversation about the real problem before anything gets built.", W);
