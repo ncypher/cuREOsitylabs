@@ -74,6 +74,32 @@ p{margin:0}
 #river{position:absolute;inset:0;width:100%;height:100%;display:block}
 .hero-inner{position:relative;z-index:1;padding-block:72px 260px;pointer-events:none}
 .hero-inner a,.hero-inner button{pointer-events:auto}
+/* Neon sign hanging over the hero */
+.sign-hang{position:relative;width:clamp(260px,40vw,470px);margin-bottom:36px;transform-origin:50% -72px;animation:sway 7s ease-in-out infinite;pointer-events:auto}
+.wire{position:absolute;top:-72px;height:82px;width:1px;background:linear-gradient(rgba(147,170,170,.25),var(--steel))}
+.wire.l{left:16%}.wire.r{right:16%}
+.plate{position:relative;padding:16px 12px 10px;border:1px solid rgba(147,170,170,.22);border-radius:14px;background:linear-gradient(155deg,rgba(255,255,255,.04),rgba(255,255,255,0) 45%),#0b1b21;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 34px 60px -30px rgba(0,0,0,.85)}
+.plate::before,.plate::after{content:"";position:absolute;top:6px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:#2b434b;box-shadow:inset 0 0 0 1px #56727a}
+.plate::before{left:16%}.plate::after{right:16%;margin:0 -4px 0 0}
+.neon-svg{display:block;width:100%;height:auto;overflow:visible}
+.neon-svg .tube path,.neon-svg .tube circle{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.neon-svg .tube .mask{fill:#0b1b21;stroke:none}
+.neon-svg .tube .river{stroke-width:4.5}
+.t-cyan{stroke:var(--grand);filter:drop-shadow(0 0 3px rgba(95,227,220,.95)) drop-shadow(0 0 11px rgba(95,227,220,.5))}
+.t-amber{stroke:var(--cedar);filter:drop-shadow(0 0 3px rgba(255,159,69,.95)) drop-shadow(0 0 11px rgba(255,159,69,.5))}
+.neon-svg .word{font:900 84px/1 var(--display);stroke-width:2.4;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,214,170,.55)) drop-shadow(0 0 14px rgba(255,159,69,.35))}
+.neon-svg .w-amber{stroke:var(--cedar);fill:rgba(255,159,69,.08)}
+.neon-svg .w-cyan{stroke:var(--grand);fill:rgba(95,227,220,.1)}
+.neon-svg .tag{font:700 17px/1 var(--display);fill:#ffe1bd;filter:drop-shadow(0 0 4px rgba(255,159,69,.85))}
+.neon-svg .n1{animation:power 1s .3s both}.neon-svg .n2{animation:power 1s .65s both}.neon-svg .n3{animation:power 1s .85s both}
+.neon-svg .n4{animation:power 1.3s 1.2s both}.neon-svg .n5{animation:power 1s 1.75s both,buzz 9s 3.5s infinite}
+.neon-svg .n6{animation:power 1s 2.05s both}.neon-svg .n7{animation:power 1s 2.2s both}
+.sign-hang:hover .hum{animation:hum .5s}
+@keyframes power{0%{opacity:.12}8%{opacity:.85}11%{opacity:.15}24%{opacity:1}27%{opacity:.3}36%,100%{opacity:1}}
+@keyframes buzz{0%,88%,90%,93%,100%{opacity:1}89%{opacity:.3}91.5%{opacity:.55}}
+@keyframes hum{0%,100%{opacity:1}18%{opacity:.55}32%{opacity:1}50%{opacity:.7}}
+@keyframes sway{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.6deg)}}
+@media (prefers-reduced-motion:reduce){.sign-hang,.neon-svg .tube,.sign-hang:hover .hum{animation:none!important}}
 .kicker{font-size:16px;color:var(--grand);margin-bottom:22px}
 .hero h1{font-size:clamp(46px,10vw,150px);line-height:.86;font-weight:900;text-transform:uppercase}
 .hero h1 .ask{display:block;white-space:nowrap}
@@ -264,6 +290,25 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
   <section class="hero" aria-labelledby="hero-title">
     <canvas id="river" aria-hidden="true"></canvas>
     <div class="wrap hero-inner" id="hero-inner">
+      <div class="sign-hang"><span class="wire l" aria-hidden="true"></span><span class="wire r" aria-hidden="true"></span><div class="plate"><svg class="neon-svg" viewBox="0 0 500 440" role="img" aria-label="cuREOsity labs neon sign: three smokestacks over a factory inside a gear, the name in glowing letters, and two rivers meeting below">
+  <g class="hum">
+    <g class="tube t-cyan n1"><path d="M72.4 237.4 L72.1 231.2 L53.0 223.3 L54.7 199.3 L74.7 194.1 L74.7 194.1 L75.9 188.0 L77.3 181.9 L78.9 175.9 L80.7 170.0 L65.5 156.0 L75.3 134.0 L95.8 136.0 L95.8 136.0 L99.0 130.7 L102.4 125.5 L106.0 120.4 L109.7 115.4 L100.2 97.1 L116.9 79.8 L135.6 88.6 L135.6 88.6 L140.4 84.7 L145.4 81.0 L150.5 77.4 L155.7 74.0 L153.0 53.5 L174.6 43.0 L189.1 57.7 L189.1 57.7 L195.0 55.7 L200.9 53.9 L206.9 52.3 L213.0 50.9 L217.5 30.7 L241.4 28.2 L250.0 47.0 L250.0 47.0 L256.2 47.1 L262.4 47.4 L268.6 48.0 L274.8 48.7 L285.9 31.3 L309.2 37.1 L310.9 57.7 L310.9 57.7 L316.7 60.0 L322.4 62.4 L328.0 65.0 L333.6 67.8 L350.0 55.3 L369.9 68.7 L364.4 88.6 L364.4 88.6 L369.1 92.7 L373.6 97.0 L378.0 101.4 L382.3 105.9 L402.0 99.7 L416.1 119.2 L404.2 136.0 L404.2 136.0 L407.2 141.4 L410.0 147.0 L412.6 152.6 L415.0 158.3 L435.7 159.2 L442.3 182.4 L425.3 194.1 L425.3 194.1 L426.3 200.2 L427.0 206.4 L427.6 212.6 L427.9 218.8 L428.0 225.0 L427.9 231.2 L427.6 237.4"/><path d="M92.4 197.2 L93.5 191.7 L94.8 186.3 L96.2 180.9 L97.8 175.6 L99.6 170.3 L101.7 165.1 L103.8 159.9 L106.2 154.9 L108.7 149.9 L111.4 145.0 L114.3 140.2 L117.4 135.5 L120.6 131.0 L123.9 126.5 L127.4 122.2 L131.1 117.9 L134.9 113.9 L138.9 109.9 L142.9 106.1 L147.2 102.4 L151.5 98.9 L156.0 95.6 L160.5 92.4 L165.2 89.3 L170.0 86.4 L174.9 83.7 L179.9 81.2 L184.9 78.8 L190.1 76.7 L195.3 74.6 L200.6 72.8 M299.4 72.8 L304.7 74.6 L309.9 76.7 L315.1 78.8 L320.1 81.2 L325.1 83.7 L330.0 86.4 L334.8 89.3 L339.5 92.4 L344.0 95.6 L348.5 98.9 L352.8 102.4 L357.1 106.1 L361.1 109.9 L365.1 113.9 L368.9 117.9 L372.6 122.2 L376.1 126.5 L379.4 131.0 L382.6 135.5 L385.7 140.2 L388.6 145.0 L391.3 149.9 L393.8 154.9 L396.2 159.9 L398.3 165.1 L400.4 170.3 L402.2 175.6 L403.8 180.9 L405.2 186.3 L406.5 191.7 L407.6 197.2"/><path d="M105.0 157.4 L140.3 159.1 M142.9 106.1 L170.1 115.0 M357.1 106.1 L329.9 115.0 M395.0 157.4 L359.7 159.1"/><g class="dots"><circle cx="140.3" cy="159.1" r="5"/><circle cx="170.1" cy="115.0" r="5"/><circle cx="329.9" cy="115.0" r="5"/><circle cx="359.7" cy="159.1" r="5"/><circle cx="92.4" cy="197.2" r="5"/><circle cx="200.6" cy="72.8" r="5"/><circle cx="299.4" cy="72.8" r="5"/><circle cx="407.6" cy="197.2" r="5"/></g></g>
+    <g class="tube t-amber n2">
+      <path class="mask" d="M160 160 L164 34 H180 L184 160 Z M205 150 L208 56 H223 L226 150 Z M245 150 L248 74 H262 L265 150 Z"/>
+      <path d="M160 160 L164 34 H180 L184 160 M205 150 L208 56 H223 L226 150 M245 150 L248 74 H262 L265 150"/>
+      <g class="dots"><circle cx="168" cy="27" r="2.6"/><circle cx="176" cy="27" r="2.6"/><circle cx="212" cy="49" r="2.6"/><circle cx="219" cy="49" r="2.6"/><circle cx="252" cy="67" r="2.6"/><circle cx="258" cy="67" r="2.6"/></g>
+    </g>
+    <g class="tube t-amber n3">
+      <path class="mask" d="M112 234 V184 H148 V160 H268 V150 H330 V174 H388 V234 Z"/>
+      <path d="M112 234 V184 H148 V160 H268 V150 H330 V174 H388 V234 M96 236 H404 M148 184 H388 M148 184 V234 M118 196 L142 220 M118 220 L142 196"/>
+      <path d="M168 200 h12 v16 h-12 z M194 200 h12 v16 h-12 z M220 200 h12 v16 h-12 z M246 200 h12 v16 h-12 z M272 200 h12 v16 h-12 z M298 200 h12 v16 h-12 z M324 200 h12 v16 h-12 z M350 200 h12 v16 h-12 z"/>
+    </g>
+    <text class="tube word n4" x="250" y="306" text-anchor="middle" textLength="436" lengthAdjust="spacingAndGlyphs"><tspan class="w-amber">cu</tspan><tspan class="w-cyan">REO</tspan><tspan class="w-amber">sity labs</tspan></text>
+    <text class="tube tag n5" x="250" y="336" text-anchor="middle" textLength="340" lengthAdjust="spacingAndGlyphs">WHERE CURIOSITY AND AUTOMATION CONVERGE.</text>
+    <g class="tube t-cyan n6"><path d="M44 360 H92 L110 378 H146 M60 392 H96 L114 410"/><path class="river" d="M78 436 C118 404 160 420 196 392 S238 362 250 356"/><g class="dots"><circle cx="40" cy="360" r="4.5"/><circle cx="150" cy="378" r="4.5"/><circle cx="56" cy="392" r="4.5"/></g></g>
+    <g class="tube t-amber n7"><path d="M456 360 H408 L390 378 H354 M440 392 H404 L386 410"/><path class="river" d="M430 438 C392 416 340 418 306 394 S262 364 250 356"/><g class="dots"><circle cx="460" cy="360" r="4.5"/><circle cx="350" cy="378" r="4.5"/><circle cx="444" cy="392" r="4.5"/></g></g>
+  </g>
+</svg></div></div>
       <p class="kicker">An independent technology workshop in REO Town, Lansing</p>
       <h1 id="hero-title"><span class="ask">Ask “what if?”</span> <span class="tube">We’ll build the how.</span></h1>
       <p class="lede">Enterprise-grade software at a small-business price. Custom databases, connected systems, and practical AI, built around the way your business already works.</p>
