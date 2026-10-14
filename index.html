@@ -156,6 +156,7 @@ p{margin:0}
 .drawer-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;padding:0 72px 34px 0}
 .tags{display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;margin:0;padding:0;list-style:none}
 .tags li{font-size:14px;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;color:var(--fog)}
+.drawer-note{grid-column:1/-1;font-size:18px;line-height:1.65;max-width:72ch;color:var(--fog)}
 .first-job{border-left:3px solid var(--grand);padding-left:18px}
 .first-job span{display:block;font:800 18px/1 var(--display);text-transform:uppercase;letter-spacing:.04em;color:var(--grand);margin-bottom:8px}
 .drawer[open] .drawer-body{animation:open .3s ease-out}
@@ -361,15 +362,16 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
         <details class="drawer">
           <summary><h3>Integrations &amp; middleware</h3><p>For systems that don’t talk to each other.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
-            <ul class="tags"><li>REST APIs</li><li>Webhooks</li><li>Python services</li><li>Scheduled syncs</li><li>Document and report automation</li></ul>
+            <ul class="tags"><li>QuickBooks integrations</li><li>REST APIs</li><li>Webhooks</li><li>Python services</li><li>Scheduled syncs</li><li>Document and report automation</li></ul>
             <p class="first-job"><span>A typical first job</span>Send new jobs from the estimating tool straight into the schedule and the invoice, so nobody types them in twice.</p>
           </div>
         </details>
         <details class="drawer">
-          <summary><h3>QuickBase &amp; ServiceNow</h3><p>Enterprise platforms, set up for a business your size.</p><span class="knob" aria-hidden="true"></span></summary>
+          <summary><h3>QuickBase &amp; ServiceNow</h3><p>A powerful foundation, turned into software people enjoy using.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
-            <ul class="tags"><li>QuickBase apps and code pages</li><li>ServiceNow applications</li><li>Workflow design</li><li>Cleanup of existing builds</li></ul>
-            <p class="first-job"><span>A typical first job</span>Untangle a QuickBase app that grew without a plan: fix the relationships, retire dead fields, and add the reports people keep asking for.</p>
+            <p class="drawer-note">QuickBase is a strong engine with a dated dashboard. We build modern custom software on top of it: full applications that run natively inside QuickBase code pages, plus middleware that connects it to QuickBooks and the rest of your tools. Same engine, but it drives like a sports car instead of a bulldozer.</p>
+            <ul class="tags"><li>Custom apps inside QuickBase code pages</li><li>Modern, phone-friendly interfaces</li><li>QuickBooks integrations</li><li>Middleware connectors</li><li>ServiceNow applications</li><li>Cleanup of existing builds</li></ul>
+            <p class="first-job"><span>A typical first job</span>Put a clean, phone-friendly app on top of an existing QuickBase setup, so the field crew taps through their jobs instead of fighting forms, and invoices flow into QuickBooks on their own.</p>
           </div>
         </details>
         <details class="drawer">
@@ -380,9 +382,10 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
           </div>
         </details>
         <details class="drawer">
-          <summary><h3>Sensors &amp; LoRa mesh</h3><p>Data from places Wi-Fi doesn’t reach.</p><span class="knob" aria-hidden="true"></span></summary>
+          <summary><h3>Sensors &amp; LoRa mesh</h3><p>Custom IoT that works with or without the internet.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
-            <ul class="tags"><li>Temperature and equipment sensors</li><li>LoRa mesh with Meshtastic</li><li>ESP32 hardware</li><li>Enclosures built by hand in REO Town</li></ul>
+            <p class="drawer-note">We write custom IoT software for sensors and devices that keeps running whether or not the internet is up. Devices talk to each other over a local LoRa radio mesh, keep their readings on-site, and sync to the cloud only when you want them to.</p>
+            <ul class="tags"><li>Works offline or online</li><li>Custom IoT software</li><li>Temperature and equipment sensors</li><li>LoRa mesh with Meshtastic</li><li>ESP32 hardware</li><li>Enclosures built by hand in REO Town</li></ul>
             <p class="first-job"><span>A typical first job</span>Put a sensor in a walk-in cooler and raise an alert when it drifts, over a long-range radio link with no monthly cell bill.</p>
           </div>
         </details>
