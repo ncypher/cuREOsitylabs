@@ -4,9 +4,11 @@ Company website for CuREOsity Labs, an independent technology workshop in REO To
 
 ## Website
 
-`index.html` is a complete, dependency-free static website with embedded brand artwork. Deploy it directly using GitHub Pages, Cloudflare Pages, or any static host.
+`index.html` is a complete static website with no build step. Artwork lives in `assets/` (`cureosity-neon.webp` for the page, `og-card.png` for link previews). Fonts load from Google Fonts. Deploy directly with GitHub Pages, Cloudflare Pages, or any static host.
 
-The project workbench runs entirely in the visitor’s browser and downloads a text brief. It does not transmit submissions or include a contact inbox.
+The hero is a canvas river confluence (Grand + Red Cedar) that visitors can stir with the pointer; it pauses off-screen and renders a still frame for reduced-motion users.
+
+The what-if workbench runs entirely in the visitor’s browser. It builds a work order the visitor can copy, download, or open in their own mail app addressed to `CONTACT_EMAIL` (set at the top of the script). Nothing is transmitted by the site itself.
 
 ## Intended domain
 
@@ -16,7 +18,7 @@ For GitHub Pages, enable Pages for the default branch / root, then set the custo
 
 ## Content
 
-Founded October 13, 2026 by Thomas Charles Harwood. Address and company description supplied by the founder. No testimonials, client logos, or outcome statistics are asserted.
+Founded October 13, 2026 by Thomas Charles Harwood. Company description supplied by the founder. No street address is published. No testimonials, client logos, or outcome statistics are asserted.
 
 ## Checks
 
