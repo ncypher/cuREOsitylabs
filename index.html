@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>cuREOsity labs | Where curiosity and automation converge</title>
-<meta name="description" content="CuREOsity Labs is an independent technology workshop in REO Town, Lansing: custom software, databases, integrations, QuickBase and ServiceNow, applied AI, and LoRa sensor networks at a small-business price.">
+<meta name="description" content="CuREOsity Labs is an independent technology workshop in REO Town, Lansing: consulting, custom software, integrations, QuickBase and ServiceNow, private local AI, and sensor networks at a small-business price.">
 <meta name="theme-color" content="#03080a">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2303080a'/%3E%3Cpath d='M17 40V10h6v30M29 40V16h6v24M41 40V22h6v18' fill='none' stroke='%23ff9f45' stroke-width='3'/%3E%3Cpath d='M8 50c8-6 16 6 24 0s16 6 24 0' fill='none' stroke='%235fe3dc' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="canonical" href="https://cureositylabs.com/">
@@ -242,8 +242,15 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 
 /* Roots */
 .roots{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:64px;align-items:center}
-.sign{margin:0;background:#000;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
-.sign figcaption{padding:14px 18px;font-size:14px;color:var(--steel);background:var(--deep);border-top:1px solid var(--rule)}
+.timeline{list-style:none;margin:0;padding:0;border-left:1px solid var(--rule)}
+.timeline li{position:relative;display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;align-items:baseline;padding:14px 0 14px 26px}
+.timeline li::before{content:"";position:absolute;left:-5px;top:24px;width:9px;height:9px;border-radius:50%;background:var(--deep);border:1px solid var(--steel)}
+.timeline .yr{font:900 38px/1 var(--display);color:transparent;-webkit-text-stroke:1.3px var(--grand);font-variant-numeric:tabular-nums}
+.timeline p{margin:0;font-size:17px;line-height:1.5;color:var(--steel)}
+.timeline .now::before{background:var(--cedar);border-color:var(--cedar);box-shadow:0 0 12px var(--cedar)}
+.timeline .now .yr{-webkit-text-stroke-color:var(--cedar);text-shadow:0 0 14px rgba(255,159,69,.45)}
+.timeline .now p{color:var(--fog)}
+@media (max-width:520px){.timeline li{grid-template-columns:1fr;gap:4px}}
 .roots-text p{font-size:19px;line-height:1.7;color:var(--fog);max-width:58ch}
 .roots-text p+p{margin-top:18px}
 .roots-text h2{margin-bottom:30px}
@@ -251,7 +258,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 .founder-links{margin-top:0}
 .founder p a{color:var(--grand)}
 .founder p{font-size:16px;color:var(--steel);max-width:44ch}
-@media (max-width:900px){.roots{grid-template-columns:1fr;gap:40px}.sign{max-width:520px}}
+@media (max-width:900px){.roots{grid-template-columns:1fr;gap:40px}.roots-text{order:-1}}
 
 /* Closing + footer */
 .closing{text-align:left}
@@ -287,7 +294,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
       <small>Where curiosity and automation converge.</small>
     </a>
     <nav class="nav" aria-label="Main">
-      <a class="link" href="#build">What we build</a>
+      <a class="link" href="#build">What we do</a>
       <a class="link" href="#process">How it works</a>
       <a class="link" href="#notes">Field notes</a>
       <a class="link" href="#roots">REO roots</a>
@@ -330,10 +337,10 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 </svg></div>
       <p class="kicker">An independent technology workshop in REO Town, Lansing</p>
       <h1 id="hero-title"><span class="ask">Ask “what if?”</span> <span class="tube">We’ll build the how.</span></h1>
-      <p class="lede">Enterprise-grade software at a small-business price. Custom databases, connected systems, and practical AI, built around the way your business already works.</p>
+      <p class="lede">Enterprise-grade software at a small-business price. Straight advice, custom software, connected systems, and private AI, built around the way your business already works.</p>
       <div class="actions">
         <a class="btn" href="#workbench">Start with your what-if</a>
-        <a class="btn ghost" href="#build">See what we build</a>
+        <a class="btn ghost" href="#build">See what we do</a>
       </div>
       <p class="river-note">The Grand and the Red Cedar meet a few blocks from the workshop. Drag across the water below to stir up an eddy.</p>
     </div>
@@ -351,6 +358,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
           <tr><th scope="row">Cost</th><td class="theirs">Per-seat fees that grow every year you use it</td><td class="ours">A build you own, with support when you want it</td></tr>
           <tr><th scope="row">Fit</th><td class="theirs">Your team bends its work to match the software</td><td class="ours">Software shaped around the way your team already works</td></tr>
           <tr><th scope="row">Data</th><td class="theirs">Lives on someone else’s servers, on their terms</td><td class="ours">Stays where you decide, including on your own hardware</td></tr>
+          <tr><th scope="row">AI</th><td class="theirs">Your questions and files go to a big tech model</td><td class="ours">Private AI that can run on a machine in your office</td></tr>
           <tr><th scope="row">Help</th><td class="theirs">A ticket queue and a chatbot</td><td class="ours">The person who wrote the code, a few miles away</td></tr>
         </tbody>
       </table>
@@ -360,11 +368,19 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
   <section class="band deep" id="build" aria-labelledby="build-title">
     <div class="wrap">
       <div class="band-head">
-        <h2 id="build-title">What we build</h2>
+        <h2 id="build-title">What we do</h2>
         <p>Start with the problem. Open a drawer to see the kind of first job each one usually begins with.</p>
       </div>
       <div class="drawers">
         <details class="drawer" open>
+          <summary><h3>Consulting &amp; strategy</h3><p>A straight answer before you spend a dollar.</p><span class="knob" aria-hidden="true"></span></summary>
+          <div class="drawer-body">
+            <p class="drawer-note">Not sure what you need yet? Start here. We look at how your business runs today, sort out which tools are worth paying for, and map where software, automation, and AI would actually save time. Everything is explained in your industry’s language, not tech jargon. That includes the marketing side: your website, how leads reach you, and the follow-up that keeps them from slipping away. This site is a working example, from its lead capture to its AI brief helper.</p>
+            <ul class="tags"><li>Software and automation assessments</li><li>Tool and vendor selection</li><li>AI readiness and usage policies</li><li>Plain-language training for your team</li><li>Websites and lead capture</li><li>Marketing automation</li></ul>
+            <p class="first-job"><span>A typical first job</span>Spend an afternoon with the owner and the office manager, map how a job moves from first call to paid invoice, and hand back a one-page plan: what to fix first, what it will cost, and what to leave alone.</p>
+          </div>
+        </details>
+        <details class="drawer">
           <summary><h3>Custom software &amp; databases</h3><p>For the spreadsheet that has outgrown itself.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
             <ul class="tags"><li>Operations tools</li><li>Inventory and barcode scanning</li><li>Dashboards</li><li>Mobile field apps</li></ul>
@@ -387,10 +403,11 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
           </div>
         </details>
         <details class="drawer">
-          <summary><h3>Applied AI</h3><p>AI with a real job to do, on your terms.</p><span class="knob" aria-hidden="true"></span></summary>
+          <summary><h3>Local &amp; applied AI</h3><p>Private AI that can run on your own hardware.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
-            <ul class="tags"><li>Assistants that answer from your own documents</li><li>MCP tools</li><li>Document triage</li><li>Local, on-site models</li></ul>
-            <p class="first-job"><span>A typical first job</span>Give the front desk an assistant that answers from your own manuals and price sheets, without pasting them into a public chatbot.</p>
+            <p class="drawer-note">For some businesses, keeping customer data off big tech’s servers is a matter of principle. For others, like medical, legal, and financial offices, it’s a safety concern and part of the rules they work under. We can run capable AI models on a machine in your office, so your documents and questions never leave the building. When a cloud model is the better fit, we’ll say so and explain the tradeoff in plain terms.</p>
+            <ul class="tags"><li>Local, on-site AI models</li><li>Assistants that answer from your own documents</li><li>Document triage</li><li>MCP tools</li><li>Cloud AI when it fits, with clear tradeoffs</li></ul>
+            <p class="first-job"><span>A typical first job</span>Set up a small AI server in the office that answers staff questions from your own manuals and price sheets, with nothing leaving your network.</p>
           </div>
         </details>
         <details class="drawer">
@@ -439,6 +456,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
             <legend>Where do you want to start?</legend>
             <div class="chips">
               <label class="chip"><input type="radio" name="start" id="start-automate" value="automate" checked><span>Automate a task</span></label>
+              <label class="chip"><input type="radio" name="start" id="start-advice" value="advice"><span>Get straight advice</span></label>
               <label class="chip"><input type="radio" name="start" id="start-connect" value="connect"><span>Connect my systems</span></label>
               <label class="chip"><input type="radio" name="start" id="start-ai" value="ai"><span>Put AI to work</span></label>
               <label class="chip"><input type="radio" name="start" id="start-build" value="build"><span>Build something new</span></label>
@@ -557,14 +575,18 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 
   <section class="band deep" id="roots" aria-labelledby="roots-title">
     <div class="wrap roots">
-      <figure class="sign">
-        <img src="assets/cureosity-neon.webp" width="900" height="900" loading="lazy" decoding="async" alt="Neon sign of the cuREOsity labs logo: three smokestacks over a factory, framed by a gear and circuit traces, with a cyan river and an amber river meeting below the name.">
-        <figcaption>Three stacks, one factory, and two rivers meeting below the name.</figcaption>
-      </figure>
+      <ol class="timeline" aria-label="REO Town, 1904 to 2026">
+        <li><span class="yr">1904</span><p>Ransom E. Olds founds the REO Motor Car Company in Lansing.</p></li>
+        <li><span class="yr">1910</span><p>The REO Motor Truck Company follows. Its Speed Wagon becomes a workhorse.</p></li>
+        <li><span class="yr">1933</span><p>REO offers one of the first practical automatic transmissions.</p></li>
+        <li><span class="yr">1936</span><p>Car production ends. REO turns to trucks and military vehicles.</p></li>
+        <li><span class="yr">1975</span><p>Diamond REO closes. The plant is razed four years later.</p></li>
+        <li class="now"><span class="yr">2026</span><p>CuREOsity Labs opens in REO Town, building tools for the next shift.</p></li>
+      </ol>
       <div class="roots-text">
         <h2 id="roots-title">REO Town has always built things</h2>
         <p>This neighborhood grew up around a factory that put working machines in ordinary hands. The plant is gone, but the habit stuck: REO Town is still a place where people make, fix, and figure things out.</p>
-        <p>CuREOsity Labs carries that forward with software. Founded October 13, 2026, it’s a workshop for custom databases, web applications, integrations, sensors, and AI, sized for the businesses that keep this city running.</p>
+        <p>CuREOsity Labs carries that forward with software. Founded October 13, 2026, it’s a workshop for consulting, custom software, integrations, sensors, and private AI, sized for the businesses that keep this city running.</p>
         <div class="founder">
           <p>Started by Thomas Charles Harwood, who grew up in the trades, studied art, and has spent years building enterprise systems. Reach him directly at <a href="mailto:tomharwood@cureositylabs.com">tomharwood@cureositylabs.com</a>.</p>
           <div class="actions founder-links"><a class="btn ghost" href="https://thomas-harwood.com" target="_blank" rel="noopener">Meet Tom</a><a class="btn ghost" href="https://github.com/ncypher" target="_blank" rel="noopener">Tom on GitHub</a></div>
@@ -821,9 +843,10 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
   });
 
   /* ---------- Workbench ---------- */
-  var LABELS = {automate:"Automate a task", connect:"Connect my systems", ai:"Put AI to work", build:"Build something new", field:"Sensors and field data"};
+  var LABELS = {automate:"Automate a task", advice:"Get straight advice", connect:"Connect my systems", ai:"Put AI to work", build:"Build something new", field:"Sensors and field data"};
   var QUESTIONS = {
     automate:"Which task does someone repeat every week, and how long does it take each time?",
+    advice:"What decision are you trying to make, and what happens if it goes wrong?",
     connect:"Where does someone type the same information into a second system?",
     ai:"What question does your team answer over and over from the same documents?",
     build:"Who will use it first, and what do they do today instead?",
