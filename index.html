@@ -15,7 +15,20 @@
 <meta property="og:image" content="https://cureositylabs.com/assets/og-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Big+Shoulders+Display:wght@700;800;900&display=swap">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* Section navigation: a "you are here" mark, and a scrollable row on small screens. */
+.nav a.link[aria-current="true"]{color:var(--fog);box-shadow:inset 0 -2px 0 var(--grand)}
+.nav a.link{padding-block:6px}
+.jump{display:none}
+@media (min-width:861px){.hero .sign-hang{width:min(100%,820px,50vh);width:min(100%,820px,50svh)}}
+@media (max-width:860px){
+  html{scroll-padding-top:120px}
+  .jump{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 max(16px,env(safe-area-inset-left,0px)) 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  .jump::-webkit-scrollbar{display:none}
+  .jump a{flex:none;scroll-snap-align:start;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;color:var(--steel);font-size:14px;text-decoration:none;white-space:nowrap}
+  .jump a[aria-current="true"]{color:var(--deep,#03080a);background:var(--grand);border-color:var(--grand)}
+}
+</style>
 </head>
 <body>
 <style>
@@ -301,6 +314,13 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
       <a class="btn small" href="#workbench">Start a project</a>
     </nav>
   </div>
+  <nav class="jump" aria-label="Sections">
+    <a href="#build">What we do</a>
+    <a href="#process">How it works</a>
+    <a href="#workbench">Start a project</a>
+    <a href="#notes">Field notes</a>
+    <a href="#roots">REO roots</a>
+  </nav>
 </header>
 
 <main id="top">
@@ -1042,5 +1062,31 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 })();
 </script>
 
+
+<script>
+/* Mark the section in view in both navs. */
+(function(){
+  "use strict";
+  if (!("IntersectionObserver" in window)) return;
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav a.link, .jump a'));
+  var ids = ["build","process","workbench","notes","roots"];
+  var row = document.querySelector('.jump');
+  function mark(id){
+    links.forEach(function(a){
+      var on = a.getAttribute("href") === "#" + id;
+      if (on) a.setAttribute("aria-current","true"); else a.removeAttribute("aria-current");
+      if (on && row && a.parentNode === row && row.scrollWidth > row.clientWidth) {
+        row.scrollTo({left: a.offsetLeft - 16, behavior: "smooth"});
+      }
+    });
+  }
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting) mark(e.target.id); });
+  }, {rootMargin: "-40% 0px -55% 0px"});
+  ids.forEach(function(id){ var el = document.getElementById(id); if (el) io.observe(el); });
+  var hero = document.querySelector('.hero');
+  if (hero) new IntersectionObserver(function(es){ if (es[0].isIntersecting) mark(""); }, {rootMargin: "-40% 0px -55% 0px"}).observe(hero);
+})();
+</script>
 </body>
 </html>
