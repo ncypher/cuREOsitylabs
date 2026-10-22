@@ -19,10 +19,11 @@
 /* Section navigation: a "you are here" mark, and a scrollable row on small screens. */
 .nav a.link[aria-current="true"]{color:var(--fog);box-shadow:inset 0 -2px 0 var(--grand)}
 .nav a.link{padding-block:6px}
+.nav a.btn[aria-current="true"]{box-shadow:0 0 0 2px var(--deep,#03080a),0 0 0 4px var(--grand)}
 .jump{display:none}
 @media (min-width:861px){.hero .sign-hang{width:min(100%,820px,50vh);width:min(100%,820px,50svh)}}
 @media (max-width:860px){
-  html{scroll-padding-top:120px}
+  html:root{scroll-padding-top:120px}
   .jump{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 max(16px,env(safe-area-inset-left,0px)) 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
   .jump::-webkit-scrollbar{display:none}
   .jump a{flex:none;scroll-snap-align:start;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;color:var(--steel);font-size:14px;text-decoration:none;white-space:nowrap}
@@ -1074,28 +1075,40 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
 
 
 <script>
-/* Mark the section in view in both navs. */
+/* Mark the section in view in both navs: whichever section crosses a line 40% down the screen. */
 (function(){
   "use strict";
-  if (!("IntersectionObserver" in window)) return;
-  var links = Array.prototype.slice.call(document.querySelectorAll('.nav a.link, .jump a'));
-  var ids = ["build","process","workbench","notes","roots"];
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav a.link, .nav a.btn[href="#workbench"], .jump a'));
+  var sections = ["build","process","workbench","notes","roots"]
+    .map(function(id){ return document.getElementById(id); })
+    .filter(Boolean);
   var row = document.querySelector('.jump');
+  var reduce = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  var current = null, queued = false;
   function mark(id){
+    if (id === current) return;
+    current = id;
     links.forEach(function(a){
-      var on = a.getAttribute("href") === "#" + id;
+      var on = !!id && a.getAttribute("href") === "#" + id;
       if (on) a.setAttribute("aria-current","true"); else a.removeAttribute("aria-current");
       if (on && row && a.parentNode === row && row.scrollWidth > row.clientWidth) {
-        row.scrollTo({left: a.offsetLeft - 16, behavior: "smooth"});
+        row.scrollTo({left: a.offsetLeft - 16, behavior: reduce && reduce.matches ? "auto" : "smooth"});
       }
     });
   }
-  var io = new IntersectionObserver(function(es){
-    es.forEach(function(e){ if (e.isIntersecting) mark(e.target.id); });
-  }, {rootMargin: "-40% 0px -55% 0px"});
-  ids.forEach(function(id){ var el = document.getElementById(id); if (el) io.observe(el); });
-  var hero = document.querySelector('.hero');
-  if (hero) new IntersectionObserver(function(es){ if (es[0].isIntersecting) mark(""); }, {rootMargin: "-40% 0px -55% 0px"}).observe(hero);
+  function update(){
+    queued = false;
+    var line = window.innerHeight * 0.4, id = null;
+    for (var i = 0; i < sections.length; i++) {
+      var r = sections[i].getBoundingClientRect();
+      if (r.top <= line && r.bottom > line) { id = sections[i].id; break; }
+    }
+    mark(id);
+  }
+  function queue(){ if (!queued) { queued = true; requestAnimationFrame(update); } }
+  window.addEventListener("scroll", queue, {passive: true});
+  window.addEventListener("resize", queue);
+  update();
 })();
 </script>
 
