@@ -28,6 +28,15 @@
   .jump a{flex:none;scroll-snap-align:start;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;color:var(--steel);font-size:14px;text-decoration:none;white-space:nowrap}
   .jump a[aria-current="true"]{color:var(--deep,#03080a);background:var(--grand);border-color:var(--grand)}
 }
+
+/* Services: three showing, the rest one tap away. */
+.drawers.collapsed .drawer.more{display:none}
+.more-toggle{margin-top:22px;background:none;border:1px solid var(--rule);color:var(--fog);font:700 16px/1 var(--body);padding:12px 18px;border-radius:999px;cursor:pointer}
+.more-toggle:hover{border-color:var(--grand)}
+.more-toggle::after{content:" +";color:var(--grand)}
+.more-toggle[aria-expanded="true"]::after{content:" \2212"}
+.cta-short{display:none}
+@media (max-width:480px){.cta-long{display:none}.cta-short{display:inline}}
 </style>
 </head>
 <body>
@@ -311,7 +320,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
       <a class="link" href="#process">How it works</a>
       <a class="link" href="#notes">Field notes</a>
       <a class="link" href="#roots">REO roots</a>
-      <a class="btn small" href="#workbench">Start a project</a>
+      <a class="btn small" href="#workbench"><span class="cta-long">Start a project</span><span class="cta-short">Start</span></a>
     </nav>
   </div>
   <nav class="jump" aria-label="Sections">
@@ -422,7 +431,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
             <p class="first-job"><span>A typical first job</span>Put a clean, phone-friendly app on top of an existing QuickBase setup, so the field crew taps through their jobs instead of fighting forms, and invoices flow into QuickBooks on their own.</p>
           </div>
         </details>
-        <details class="drawer">
+        <details class="drawer more">
           <summary><h3>Local &amp; applied AI</h3><p>Private AI that can run on your own hardware.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
             <p class="drawer-note">For some businesses, keeping customer data off big tech’s servers is a matter of principle. For others, like medical, legal, and financial offices, it’s a safety concern and part of the rules they work under. We can run capable AI models on a machine in your office, so your documents and questions never leave the building. When a cloud model is the better fit, we’ll say so and explain the tradeoff in plain terms.</p>
@@ -430,7 +439,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
             <p class="first-job"><span>A typical first job</span>Set up a small AI server in the office that answers staff questions from your own manuals and price sheets, with nothing leaving your network.</p>
           </div>
         </details>
-        <details class="drawer">
+        <details class="drawer more">
           <summary><h3>Sensors &amp; LoRa mesh</h3><p>Custom IoT that works with or without the internet.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
             <p class="drawer-note">We write custom IoT software for sensors and devices that keeps running whether or not the internet is up. Devices talk to each other over a local LoRa radio mesh, keep their readings on-site, and sync to the cloud only when you want them to.</p>
@@ -438,7 +447,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
             <p class="first-job"><span>A typical first job</span>Put a sensor in a walk-in cooler and raise an alert when it drifts, over a long-range radio link with no monthly cell bill.</p>
           </div>
         </details>
-        <details class="drawer">
+        <details class="drawer more">
           <summary><h3>Ledgers &amp; Web3</h3><p>Records nobody can quietly change.</p><span class="knob" aria-hidden="true"></span></summary>
           <div class="drawer-body">
             <ul class="tags"><li>Tamper-evident audit trails</li><li>Hash-anchored records</li><li>Ledger-style inventory history</li></ul>
@@ -446,6 +455,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
           </div>
         </details>
       </div>
+      <button class="more-toggle" type="button" aria-expanded="true" hidden>Show fewer services</button>
     </div>
   </section>
 
@@ -1086,6 +1096,30 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
   ids.forEach(function(id){ var el = document.getElementById(id); if (el) io.observe(el); });
   var hero = document.querySelector('.hero');
   if (hero) new IntersectionObserver(function(es){ if (es[0].isIntersecting) mark(""); }, {rootMargin: "-40% 0px -55% 0px"}).observe(hero);
+})();
+</script>
+
+<script>
+/* Collapse the last four services behind one button (everything stays visible without JS). */
+(function(){
+  "use strict";
+  var box = document.querySelector('#build .drawers');
+  var btn = document.querySelector('#build .more-toggle');
+  if (!box || !btn) return;
+  var extra = box.querySelectorAll('.drawer.more').length;
+  function set(open){
+    box.classList.toggle('collapsed', !open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? 'Show fewer services' : 'Show ' + extra + ' more services';
+  }
+  btn.hidden = false;
+  set(false);
+  btn.addEventListener('click', function(){
+    var open = btn.getAttribute('aria-expanded') !== 'true';
+    set(open);
+    if (open) { var first = box.querySelector('.drawer.more summary'); if (first) first.focus(); }
+    else btn.scrollIntoView({block:'nearest'});
+  });
 })();
 </script>
 </body>
