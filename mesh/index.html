@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>REO Town mesh window | cuREOsity labs</title>
+<meta name="description" content="A signed-in window into the REO Town LoRa mesh, built by cuREOsity labs.">
+<meta name="theme-color" content="#03080a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2303080a'/%3E%3Cpath d='M17 40V10h6v30M29 40V16h6v24M41 40V22h6v18' fill='none' stroke='%23ff9f45' stroke-width='3'/%3E%3Cpath d='M8 50c8-6 16 6 24 0s16 6 24 0' fill='none' stroke='%235fe3dc' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://cureositylabs.com/mesh/">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Big+Shoulders+Display:wght@800;900&display=swap">
+<style>
+:root{--river:#060e12;--deep:#03080a;--rule:#17303a;--fog:#e6eeea;--steel:#93aaaa;--grand:#5fe3dc;--cedar:#ff9f45;--display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",Impact,sans-serif;--body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background:var(--river);color:var(--fog);font:17px/1.6 var(--body)}
+:focus-visible{outline:2px solid var(--grand);outline-offset:3px;border-radius:2px}
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.site-head{border-bottom:1px solid var(--rule);padding-block:18px}
+.wordmark{font:800 28px/1 var(--display);letter-spacing:.01em;color:var(--cedar);text-decoration:none}
+.wordmark b{color:var(--grand);font-weight:800}
+main{flex:1;display:flex;align-items:center;padding-block:clamp(48px,10vw,120px)}
+h1{margin:0;font:900 clamp(52px,10vw,112px)/.92 var(--display);text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+h1 span{color:var(--grand)}
+.lede{max-width:40em;margin:28px 0 0;font-size:clamp(18px,2vw,21px);color:var(--fog)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;font:800 20px/1 var(--display);letter-spacing:.04em;text-transform:uppercase;text-decoration:none;border:2px solid var(--grand);background:var(--grand);color:var(--deep);border-radius:2px;transition:background .2s,color .2s,box-shadow .2s}
+.btn:hover{background:transparent;color:var(--grand);box-shadow:0 0 22px rgba(95,227,220,.35)}
+.btn.ghost{background:transparent;color:var(--fog);border-color:var(--rule)}
+.btn.ghost:hover{border-color:var(--cedar);color:var(--cedar);box-shadow:none}
+.site-foot{border-top:1px solid var(--rule);padding-block:18px;color:var(--steel);font-size:15px}
+.site-foot a{color:inherit}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap"><a class="wordmark" href="/" aria-label="cuREOsity labs home">cu<b>REO</b>sity labs</a></div>
+</header>
+<main>
+  <div class="wrap">
+    <h1>The REO Town <span>mesh window</span></h1>
+    <p class="lede">A small LoRa radio mesh in REO Town carries live weather readings over the air. The mesh window lets invited people watch that signal from the web.</p>
+    <div class="actions">
+      <a class="btn" href="https://mesh.cureositylabs.com">Sign in</a>
+      <a class="btn ghost" href="mailto:hello@cureositylabs.com?subject=Mesh%20window%20access%20request&amp;body=Name%3A%20%0A%0AWho%20I%20am%3A%20%0A%0AWhy%20I%27d%20like%20access%3A%20%0A">Request access</a>
+    </div>
+  </div>
+</main>
+<footer class="site-foot">
+  <div class="wrap"><a href="/">Back to cuREOsity labs</a></div>
+</footer>
+</body>
+</html>
