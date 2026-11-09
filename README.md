@@ -59,3 +59,21 @@ python -m http.server 8000
 CuREOsity Labs LLC was founded October 13, 2026 by Thomas Charles Harwood in REO Town, the Lansing neighborhood built around Ransom E. Olds's REO Motor Car Company. No street address is published. The site makes no testimonial, client-logo, or outcome claims.
 
 Founder: [thomas-harwood.com](https://thomas-harwood.com) · [github.com/ncypher](https://github.com/ncypher)
+
+### AI connection status
+
+The workbench and Thomas Harwood's site share the same Cloudflare Worker. Both
+show a recent connection status using `/api/ai-status`, without exposing the key
+or running a billable request on page load. Refresh status reads the saved result;
+a result older than five minutes becomes unverified.
+
+After signing into `inbox.html`, **Test AI connection** runs one small, rate-limited
+Gemini request with the Worker's existing secret and updates status for both sites.
+It uses the existing `ADMIN_TOKEN` and counts toward the shared AI allowance.
+
+The backend is maintained in
+[`thomas-harwood/worker/worker.mjs`](https://github.com/ncypher/thomas-harwood/blob/main/worker/worker.mjs).
+Deploy that module to Cloudflare's **thomas-harwood-site** Worker as described in
+[the setup notes](https://github.com/ncypher/thomas-harwood/blob/main/worker/SETUP.md#shared-ai-connection-status-both-websites).
+GitHub Pages deploys only the frontend; pushing this repo does not deploy the Worker.
+Keep `ai-status.js` and `ai-status.css` synchronized with the personal-site repo.

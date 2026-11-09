@@ -39,6 +39,8 @@
 .cta-short{display:none}
 @media (max-width:480px){.cta-long{display:none}.cta-short{display:inline}}
 </style>
+<link rel="stylesheet" href="ai-status.css">
+<script defer src="ai-status.js"></script>
 </head>
 <body>
 <style>
@@ -497,6 +499,11 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
           <div class="field">
             <label for="wish">What if we could…</label>
             <textarea id="wish" maxlength="900" placeholder="…stop retyping every work order into three different places."></textarea>
+            <div class="ai-connection" data-ai-status="https://thomas-harwood-site.tharwood75.workers.dev/api/ai-status" data-state="unknown">
+        <span class="ai-connection__label" data-ai-label role="status" aria-live="polite">AI not checked yet</span>
+        <button type="button" aria-label="Refresh AI connection status">Refresh status</button>
+        <span data-ai-detail>Recent connection status; no AI request is made by refreshing.</span>
+      </div>
             <div class="ai-row"><button type="button" class="btn ghost small" id="ai-sharpen">Sharpen it with AI</button><span class="hint" id="ai-status">Optional. An AI first read of your idea, before Tom sees it.</span></div>
           </div>
           <section class="ai-read" id="ai-read" hidden aria-live="polite">
@@ -958,7 +965,7 @@ input[type=text]:focus,select:focus,textarea:focus{border-color:var(--grand);out
         $("ai-read").hidden = false; aiStatus.textContent = "Added to your work order."; render();
       })
       .catch(function(){ aiStatus.textContent = "Couldn’t reach the AI right now. Your brief still works without it."; })
-      .then(function(){ btn.disabled = false; btn.textContent = "Sharpen it with AI"; });
+      .then(function(){ if (window.AIConnectionStatus) window.AIConnectionStatus.refresh(); btn.disabled = false; btn.textContent = "Sharpen it with AI"; });
   });
   form.addEventListener("change", render);
   form.addEventListener("submit", function(e){ e.preventDefault(); });

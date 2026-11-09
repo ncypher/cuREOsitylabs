@@ -45,6 +45,8 @@ textarea{min-height:70px;resize:vertical}
 @media (max-width:640px){.edit{grid-template-columns:1fr}}
 .empty{color:var(--steel);border:1px dashed var(--rule);padding:28px;text-align:center;border-radius:3px}
 </style>
+<link rel="stylesheet" href="ai-status.css">
+<script defer src="ai-status.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -60,6 +62,16 @@ textarea{min-height:70px;resize:vertical}
     <button class="btn" type="submit">Open inbox</button>
   </form>
 
+  <section id="ai-health" hidden aria-label="AI connection diagnostics">
+    <h2>AI connection · both websites</h2>
+    <div class="ai-connection" data-ai-status="https://thomas-harwood-site.tharwood75.workers.dev/api/ai-status" data-state="unknown">
+        <span class="ai-connection__label" data-ai-label role="status" aria-live="polite">AI not checked yet</span>
+        <button type="button" aria-label="Refresh AI connection status">Refresh status</button>
+        <span data-ai-detail>Recent connection status; no AI request is made by refreshing.</span>
+      </div>
+    <button class="btn ghost" type="button" id="test-ai">Test AI connection</button>
+    <p class="status" id="ai-test-result" role="status">Runs one tiny Gemini request using the server's key. Counts toward the shared allowance; at most one test per minute.</p>
+  </section>
   <p class="status" id="status" role="status"></p>
   <div class="bar" id="filters" hidden></div>
   <div id="list"></div>
@@ -82,12 +94,14 @@ textarea{min-height:70px;resize:vertical}
       .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(d){ if (!r.ok) { var e = new Error(d.error || "The inbox answered " + r.status + "."); e.status = r.status; throw e; } return d; }); });
   }
   function showKeyForm(msg){
+    $("ai-health").hidden = true;
     $("key-form").hidden = false; $("refresh").hidden = true; $("forget").hidden = true; $("filters").hidden = true; $("list").textContent = "";
     say(msg || "", !!msg);
   }
   function fetchLeads(){
     say("Loading leads…");
     call("").then(function(d){
+      $("ai-health").hidden = false;
       leads = d.leads || [];
       $("key-form").hidden = true; $("refresh").hidden = false; $("forget").hidden = false;
       say(leads.length ? "" : "No leads yet."); draw();
@@ -146,6 +160,24 @@ textarea{min-height:70px;resize:vertical}
   });
   $("refresh").addEventListener("click", fetchLeads);
   $("forget").addEventListener("click", function(){ save(KEY_NAME, ""); key = ""; leads = []; showKeyForm("Key forgotten on this browser."); });
+  $("test-ai").addEventListener("click", async function(){
+    var btn = this, result = $("ai-test-result");
+    if (!key || btn.disabled) return;
+    btn.disabled = true; result.textContent = "Testing the shared Gemini connection…";
+    var controller = new AbortController(), timer = setTimeout(function(){ controller.abort(); }, 20000);
+    try {
+      var response = await fetch(new URL("/api/ai-test", API), {
+        method:"POST", credentials:"omit", headers:{Authorization:"Bearer " + key}, signal:controller.signal
+      });
+      var data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Connection test unavailable (" + response.status + "). Check that the Worker update is deployed.");
+      result.textContent = data.detail + (data.saved ? " Shared status updated for both websites." : " The result could not be saved; public status may be outdated.");
+    } catch(e) { result.textContent = e.name === "AbortError" ? "The test timed out. Wait a minute before trying again." : e.message; }
+    finally {
+      clearTimeout(timer); btn.disabled = false;
+      if (window.AIConnectionStatus) window.AIConnectionStatus.refresh();
+    }
+  });
   key = load(KEY_NAME);
   key ? fetchLeads() : showKeyForm();
 })();
